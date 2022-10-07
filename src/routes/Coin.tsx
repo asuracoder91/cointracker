@@ -7,6 +7,8 @@ import { fetchCoinInfo, fetchCoinTickers } from "../api";
 import Chart from "./Chart";
 import Price from "./Price";
 import { Helmet } from "react-helmet-async";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -58,6 +60,35 @@ const Tabs = styled.div`
   grid-template-columns: repeat(2, 1fr);
   margin: 25px 0px;
   gap: 10px;
+`;
+
+const BackButton = styled.span`
+  color: ${(props) => props.theme.textColor};
+  font-size: 36px;
+  margin-right: 20px;
+  cursor: pointer;
+  transition: opacity 0.2s linear;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const ToggleButton = styled.button`
+  position: absolute;
+  left: 30px;
+  top: 20px;
+  background-color: skyblue;
+  border: none;
+  color: white;
+  border-radius: 15px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease-in;
+  &:hover {
+    color: yellow;
+  }
 `;
 
 const Tab = styled.span<{ isActive: boolean }>`
@@ -140,6 +171,8 @@ function Coin() {
   const { state } = useLocation();
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom = () => setDarkAtom((prev) => !prev);
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["info", coinId],
     () => fetchCoinInfo(coinId!)
@@ -151,24 +184,7 @@ function Coin() {
       refetchInterval: 5000,
     }
   );
-  /* const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      console.log(infoData);
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      console.log(priceData);
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]); */
+
   const loading = infoLoading || tickersLoading;
   return (
     <Container>
@@ -178,9 +194,11 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <BackButton onClick={() => window.history.back()}>🔙</BackButton>
         <Title>
           {state?.name ? state.name : loading ? "Loading" : infoData?.name}
         </Title>
+        <ToggleButton onClick={toggleDarkAtom}>Toggle Mode</ToggleButton>
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -221,7 +239,7 @@ function Coin() {
           </Tabs>
           <Routes>
             <Route path="chart" element={<Chart coinId={coinId!} />} />
-            <Route path="price" element={<Price />} />
+            <Route path="price" element={<Price coinId={coinId!} />} />
           </Routes>
         </>
       )}

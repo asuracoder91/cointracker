@@ -30,53 +30,52 @@ function Chart({ coinId }: ChartProps) {
         "Loading chart..."
       ) : (
         <ApexChart
-          type="line"
+          type="candlestick"
           series={[
             {
-              name: "Price",
-              data: data?.map((price) => price.close) ?? [],
+              data: [
+                ...(data?.map((price) => ({
+                  x: new Date(price.time_close),
+                  y: [price.open, price.high, price.low, price.close],
+                })) ?? []),
+              ],
             },
           ]}
           options={{
             theme: {
-              mode: isDark ? "dark" : "light",
+              mode: "dark",
             },
             chart: {
-              background: "transparent",
+              type: "candlestick",
+              height: 350,
+              width: 500,
               toolbar: {
                 show: false,
               },
-              height: 500,
-              width: 500,
-            },
-            grid: {
-              borderColor: "#535353",
+              background: "transparent",
             },
             stroke: {
               curve: "smooth",
-              width: 3,
+              width: 2,
             },
             yaxis: {
               show: false,
             },
             xaxis: {
-              axisBorder: { show: false },
-              axisTicks: { show: false },
-              labels: { show: false },
               type: "datetime",
-              categories:
-                data?.map((price) =>
-                  new Date(price.time_close * 1000).toUTCString()
-                ) ?? [],
+              categories: data?.map((price) => price.time_close),
+              labels: {
+                style: {
+                  colors: "#9c88ff",
+                },
+              },
             },
-            fill: {
-              type: "gradient",
-              gradient: { gradientToColors: ["#0be881"], stops: [0, 100] },
-            },
-            colors: ["#0fbcf9"],
-            tooltip: {
-              y: {
-                formatter: (value: number) => `$ ${value.toFixed(2)}`,
+            plotOptions: {
+              candlestick: {
+                colors: {
+                  upward: "#3C90EB",
+                  downward: "#DF7D46",
+                },
               },
             },
           }}

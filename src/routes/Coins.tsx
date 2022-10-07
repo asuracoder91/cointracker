@@ -57,6 +57,24 @@ const Loader = styled.span`
   text-align: center;
 `;
 
+const ToggleButton = styled.button`
+  position: absolute;
+  left: 30px;
+  top: 20px;
+  background-color: skyblue;
+  border: none;
+  color: white;
+  border-radius: 15px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease-in;
+  &:hover {
+    color: yellow;
+  }
+`;
+
 interface ICoin {
   id: string;
   name: string;
@@ -88,7 +106,7 @@ function Coins() {
       </Helmet>
       <Header>
         <Title>코인</Title>
-        <button onClick={toggleDarkAtom}>Toggle Mode</button>
+        <ToggleButton onClick={toggleDarkAtom}>Toggle Mode</ToggleButton>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>
